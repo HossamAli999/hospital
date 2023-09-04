@@ -19,9 +19,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/dashboardAdmin',[DashboardController::class,'index']);
 
 //route for dashboard
-Route::get('/dashboard_', function () {
+Route::get('/dashboard/user', function () {
     return view('dashboard.User.dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard.user');
 
 //  
 require __DIR__.'/auth.php';
