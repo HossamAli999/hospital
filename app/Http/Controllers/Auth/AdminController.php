@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\AdminLoginRequest;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
@@ -33,22 +36,13 @@ class AdminController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(AdminLoginRequest $request) 
     {
-                // Validate the user
-                $request->validate([
-                    'email' => 'required|email',
-                    'password' => 'required|min:6'
-                ]);
-        
-                // Login the user
-                if (auth()->attempt(['email' => $request->email, 'password' => $request->password])) {
-                    // if successful, then redirect to their intended location
-                    return redirect()->intended(route('admin.dashboard'));
-                }
-        
-                // if unsuccessful, then redirect back to the login with the form data
-                return redirect()->back()->withInput($request->only('email', 'remember'));
+        $request->authenticate();
+
+        $request->session()->regenerate();
+
+        return redirect()->intended(RouteServiceProvider::ADMIN);           
     } 
 
     /**
@@ -91,8 +85,14 @@ class AdminController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        //
+        Auth::guard('admin')->logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        return redirect('/');
     }
 }

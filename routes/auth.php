@@ -19,15 +19,18 @@ Route::middleware('guest')->group(function () {
     Route::post('register', [RegisteredUserController::class, 'store']);
 
     // route for user login
-    Route::get('User/login', [AuthenticatedSessionController::class, 'create'])
+    Route::get('User/login', [AuthenticatedSessionController::class, 'create'])->middleware('guest')
                 ->name('login');
 
-    Route::post('login', [AuthenticatedSessionController::class, 'store'])->name('login.user');
+    Route::post('login', [AuthenticatedSessionController::class, 'store'])->middleware('guest')->name('login.user');
 
     // route for admin login
+    Route::post('Admin/login', [AdminController::class, 'store'])->middleware('guest')->name('login.admin');
 
-    Route::post('Admin/login', [AdminController::class, 'store'])->name('login.admin');
+    // route for admin logout
     
+    Route::post('logout/Admin', [AdminController::class, 'destroy'])->middleware('auth:admin')
+    ->name('logout.admin');
     
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
                 ->name('password.request');
@@ -61,6 +64,6 @@ Route::middleware('auth')->group(function () {
 
     Route::put('password', [PasswordController::class, 'update'])->name('password.update');
 
-    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
-                ->name('logout');
+    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->middleware('auth')
+                ->name('logout.user');
 });
